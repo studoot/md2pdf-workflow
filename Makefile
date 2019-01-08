@@ -1,13 +1,22 @@
+#
+# Ensure we have a defined source document
+#
 ifeq ($(DOCUMENT),)
 $(error Set variable 'DOCUMENT' in the environment or on the Make command-line)
 endif
 
+#
+# Define NULL redirection appropriately for Windows vs everything else
+#
 ifeq ($(OS),Windows_NT)
 ERROR_REDIRECT := 2>nul
 else
 ERROR_REDIRECT := 2>/dev/null
 endif
 
+#
+# Find Git and Mercurial repository roots
+#
 HGROOT := $(shell hg root $(ERROR_REDIRECT))
 GITROOT := $(shell git rev-parse --show-toplevel $(ERROR_REDIRECT))
 #
