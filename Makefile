@@ -2,6 +2,9 @@ ifeq ($(DOCUMENT),)
 $(error Set variable 'DOCUMENT' in the environment or on the Make command-line)
 endif
 
+DOCUMENT_PDF = ${DOCUMENT:.md=.pdf}
+DOCUMENT_TEX = ${DOCUMENT:.md=.tex}
+
 ifeq ($(OS),Windows_NT)
 ERROR_REDIRECT:=2>nul
 else
@@ -26,21 +29,23 @@ SCMVERSION:=$(subst -g,/,$(SCMVERSION))
 SCMVERSION:=$(subst -0/,/,$(SCMVERSION))
 endif
 
-MARKDOWN_DIALECT = markdown+smart+auto_identifiers+ascii_identifiers
-PANDOC_TEX_OPTS  = --number-sections --listings --template=pdf-template.tex --table-of-contents
+MARKDOWN_DIALECT = -f markdown+smart+auto_identifiers+ascii_identifiers
+TEMPLATE         = pdf-template.tex
+PANDOC_TEX_OPTS  = --number-sections --listings --template=$(TEMPLATE) --table-of-contents
 PANDOC_PDF_OPTS  = --pdf-engine xelatex
 PANDOC_VARIABLES = '--variable=scm-version:$(SCMVERSION)'
 
-%.pdf : %.md; pandoc $< -o $@ -f $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_PDF_OPTS) $(PANDOC_VARIABLES)
-%.tex : %.md; pandoc $< -o $@ -f $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_VARIABLES)
+%.pdf : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_PDF_OPTS) $(PANDOC_VARIABLES)
+%.tex : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_VARIABLES)
 
 .PHONY: all
-all: $(DOCUMENT).pdf
+all: $(DOCUMENT_PDF)
+
+.PHONY: TeX
+TeX:  $(DOCUMENT_TEX)
 
 .PHONY: clean
 clean:
-	rm -f $(DOCUMENT).pdf $(DOCUMENT).tex
+	rm -f $(DOCUMENT_PDF) $(DOCUMENT_TEX)
 
-.PHONY: TeX
-TeX: $(DOCUMENT).tex
-$(DOCUMENT).pdf $(DOCUMENT).tex: $(DOCUMENT).md Makefile
+$(DOCUMENT_PDF) $(DOCUMENT_TEX): $(DOCUMENT) $(TEMPLATE) $(MAKEFILE_LIST)
