@@ -44,3 +44,12 @@ Dolor ea ipsum non non nostrud nostrud officia. Duis laboris sit nostrud dolor u
 voluptate dolore id qui est. Nulla ut eu nostrud amet et irure elit aliquip labore et dolore
 commodo. Incididunt do velit magna culpa labore irure esse. Aliquip ut officia Lorem ut voluptate ex
 in tempor commodo est nulla.
+
+## Sample PlantUML Diagram
+
+```plantuml
+@startuml
+Alice -> Bob: Authentication Request Bob --> Alice: Authentication Response
+Alice -> Bob: Another authentication Request Alice <-- Bob: another authentication Response
+@enduml
+```

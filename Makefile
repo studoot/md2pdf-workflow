@@ -31,18 +31,19 @@ SCMVERSION:=$(subst -g,/,$(SCMVERSION))
 SCMVERSION:=$(subst -0/,/,$(SCMVERSION))
 endif
 
-PANDOC_COMMON_OPTS = -f markdown+smart+auto_identifiers+ascii_identifiers
+LUA_FILTERS        = plantuml.lua
+PANDOC_COMMON_OPTS = -f markdown+smart+auto_identifiers+ascii_identifiers+backtick_code_blocks+fenced_code_attributes $(foreach filter,$(LUA_FILTERS),--lua-filter=$(filter))
 TEX_TEMPLATE       = pdf-template.tex
-PANDOC_TEX_OPTS    = --standalone --number-sections --listings --template=$(TEX_TEMPLATE) --table-of-contents
+PANDOC_TEX_OPTS    = $(PANDOC_COMMON_OPTS) --standalone --number-sections --listings --template=$(TEX_TEMPLATE) --table-of-contents
 PANDOC_PDF_OPTS    = $(PANDOC_TEX_OPTS) --pdf-engine xelatex
-PANDOC_HTML_OPTS   = --standalone --table-of-contents --to html5
-PANDOC_AST_OPTS    = --standalone
+PANDOC_HTML_OPTS   = $(PANDOC_COMMON_OPTS) --standalone --table-of-contents --to html5 --self-contained
+PANDOC_AST_OPTS    = $(PANDOC_COMMON_OPTS) --standalone --to native
 PANDOC_VARIABLES   = '--variable=scm-version:$(SCMVERSION)'
 
-%.html : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_HTML_OPTS) $(PANDOC_VARIABLES)
-%.pdf : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_PDF_OPTS) $(PANDOC_VARIABLES)
-%.tex : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_VARIABLES)
-%.ast : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) -t native $(PANDOC_VARIABLES)
+%.html : %.md; pandoc $< -o $@ $(PANDOC_HTML_OPTS) $(PANDOC_VARIABLES)
+%.pdf : %.md; pandoc $< -o $@ $(PANDOC_PDF_OPTS) $(PANDOC_VARIABLES)
+%.tex : %.md; pandoc $< -o $@ $(PANDOC_TEX_OPTS) $(PANDOC_VARIABLES)
+%.ast : %.md; pandoc $< -o $@ $(PANDOC_AST_OPTS) $(PANDOC_VARIABLES)
 
 .PHONY: all
 all: pdf html
@@ -63,5 +64,5 @@ ast: $(DOCUMENT_AST)
 clean:
 	rm -f $(DOCUMENT_PDF) $(DOCUMENT_TEX)
 
-$(DOCUMENT_PDF) $(DOCUMENT_TEX) $(DOCUMENT_HTML) $(DOCUMENT_AST): $(DOCUMENT) $(MAKEFILE_LIST)
+$(DOCUMENT_PDF) $(DOCUMENT_TEX) $(DOCUMENT_HTML) $(DOCUMENT_AST): $(DOCUMENT) $(MAKEFILE_LIST) $(LUA_FILTERS)
 $(DOCUMENT_PDF) $(DOCUMENT_TEX): $(TEX_TEMPLATE)
