@@ -48,6 +48,11 @@ PANDOC_VARIABLES   = '--variable=scm-version:$(SCMVERSION)'
 .PHONY: all
 all: pdf html
 
+PRODUCTS = $(foreach var, $(filter DOCUMENT_%,$(.VARIABLES)), $($(var)))
+.PHONY: clean
+clean:
+	rm -f $(PRODUCTS)
+
 .PHONY: html
 html: $(DOCUMENT_HTML)
 
@@ -60,9 +65,5 @@ TeX: $(DOCUMENT_TEX)
 .PHONY: ast
 ast: $(DOCUMENT_AST)
 
-.PHONY: clean
-clean:
-	rm -f $(DOCUMENT_PDF) $(DOCUMENT_TEX)
-
-$(DOCUMENT_PDF) $(DOCUMENT_TEX) $(DOCUMENT_HTML) $(DOCUMENT_AST): $(DOCUMENT) $(MAKEFILE_LIST) $(LUA_FILTERS)
+$(PRODUCTS): $(DOCUMENT) $(MAKEFILE_LIST) $(LUA_FILTERS)
 $(DOCUMENT_PDF) $(DOCUMENT_TEX): $(TEX_TEMPLATE)
