@@ -185,6 +185,16 @@ $endif$
 \let\Oldtextbackslash\textbackslash
 \renewcommand{\textbackslash}{\Oldtextbackslash\hspace{0pt}}
 
+
+%% Redefine includegraphics to scale images if they're too big to fit on a page
+\usepackage[export]{adjustbox}
+\let\Oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[1]{
+\begin{center}
+\Oldincludegraphics[max width=\textwidth,max height=\textheight,keepaspectratio=true]{#1}
+\end{center}
+}
+
 \begin{document}
 
   % Title page
