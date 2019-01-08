@@ -9,13 +9,26 @@ ERROR_REDIRECT := 2>/dev/null
 endif
 
 HGROOT := $(shell hg root $(ERROR_REDIRECT))
-ifneq ($(HGROOT),)
-# Get the working copy status (for )
-HGCOMMIT := $(shell hg id -i $(ERROR_REDIRECT))
-SCMVERSION := $(shell hg log -r . -T "{latesttag}{sub('^-0', '', '-{latesttagdistance}')}/{shortest(node, 7)}" $(ERROR_REDIRECT))/$(HGCOMMIT)
-endif
 GITROOT := $(shell git rev-parse --show-toplevel $(ERROR_REDIRECT))
-ifneq ($(GITROOT),)
+#
+# Calculate relative path from Hg->Git & Git->Hg. The closer repository (the one
+# we'll use for the version) will have a relative path that differs from its
+# root.
+#
+GITRELFROMHG := $(GITROOT:$(HGROOT)/%=%)
+HGRELFROMGIT := $(HGROOT:$(GITROOT)/%=%)
+#
+# Conditionally calculate Mercurial version
+#
+ifneq ($(HGRELFROMGIT),$(HGROOT))
+# Get the working copy status (for )
+HGDIRTY   := $(findstring +,$(shell hg id -i $(ERROR_REDIRECT)))
+SCMVERSION := $(shell hg log -r . -T "{latesttag}{sub('^-0', '', '-{latesttagdistance}')}/{shortest(node, 7)}$(HGDIRTY)" $(ERROR_REDIRECT))
+endif
+#
+# Conditionally calculate Git version
+#
+ifneq ($(GITRELFROMHG),$(GITROOT))
 # Get a commit description - this will be in the form <short-SHA1> or
 # <latest-tag>-<latest-tag-distance>/g<short-SHA1>. In all cases, a '+' will be
 # appended if the working copy is dirty.
