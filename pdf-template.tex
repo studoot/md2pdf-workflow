@@ -218,10 +218,9 @@ $endif$
       \fontsize{8pt}{15pt}\selectfont
       \vfill
 $if(version)$
+      \hfill Version: $version$
 $if(scm-version)$
-      \hfill \MakeTextUppercase{Version: $version$ ($scm-version$)}
-$else$
-      \hfill \MakeTextUppercase{Version: $version$}
+ ($scm-version$)
 $endif$
 $endif$
     \end{minipage}
