@@ -4,6 +4,8 @@ endif
 
 DOCUMENT_PDF = ${DOCUMENT:.md=.pdf}
 DOCUMENT_TEX = ${DOCUMENT:.md=.tex}
+DOCUMENT_AST = ${DOCUMENT:.md=.ast}
+DOCUMENT_HTML = ${DOCUMENT:.md=.html}
 
 ifeq ($(OS),Windows_NT)
 ERROR_REDIRECT:=2>nul
@@ -29,23 +31,37 @@ SCMVERSION:=$(subst -g,/,$(SCMVERSION))
 SCMVERSION:=$(subst -0/,/,$(SCMVERSION))
 endif
 
-MARKDOWN_DIALECT = -f markdown+smart+auto_identifiers+ascii_identifiers
-TEMPLATE         = pdf-template.tex
-PANDOC_TEX_OPTS  = --number-sections --listings --template=$(TEMPLATE) --table-of-contents
-PANDOC_PDF_OPTS  = --pdf-engine xelatex
-PANDOC_VARIABLES = '--variable=scm-version:$(SCMVERSION)'
+PANDOC_COMMON_OPTS = -f markdown+smart+auto_identifiers+ascii_identifiers
+TEX_TEMPLATE       = pdf-template.tex
+PANDOC_TEX_OPTS    = --standalone --number-sections --listings --template=$(TEX_TEMPLATE) --table-of-contents
+PANDOC_PDF_OPTS    = $(PANDOC_TEX_OPTS) --pdf-engine xelatex
+PANDOC_HTML_OPTS   = --standalone --table-of-contents --to html5
+PANDOC_AST_OPTS    = --standalone
+PANDOC_VARIABLES   = '--variable=scm-version:$(SCMVERSION)'
 
+%.html : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_HTML_OPTS) $(PANDOC_VARIABLES)
 %.pdf : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_PDF_OPTS) $(PANDOC_VARIABLES)
 %.tex : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) $(PANDOC_TEX_OPTS) $(PANDOC_VARIABLES)
+%.ast : %.md; pandoc $< -o $@ $(MARKDOWN_DIALECT) -t native $(PANDOC_VARIABLES)
 
 .PHONY: all
-all: $(DOCUMENT_PDF)
+all: pdf html
+
+.PHONY: html
+html: $(DOCUMENT_HTML)
+
+.PHONY: pdf
+pdf: $(DOCUMENT_PDF)
 
 .PHONY: TeX
-TeX:  $(DOCUMENT_TEX)
+TeX: $(DOCUMENT_TEX)
+
+.PHONY: ast
+ast: $(DOCUMENT_AST)
 
 .PHONY: clean
 clean:
 	rm -f $(DOCUMENT_PDF) $(DOCUMENT_TEX)
 
-$(DOCUMENT_PDF) $(DOCUMENT_TEX): $(DOCUMENT) $(TEMPLATE) $(MAKEFILE_LIST)
+$(DOCUMENT_PDF) $(DOCUMENT_TEX) $(DOCUMENT_HTML) $(DOCUMENT_AST): $(DOCUMENT) $(MAKEFILE_LIST)
+$(DOCUMENT_PDF) $(DOCUMENT_TEX): $(TEX_TEMPLATE)
