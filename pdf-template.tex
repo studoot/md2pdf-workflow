@@ -149,6 +149,9 @@ $endif$
 
 % Pandoc hacks
 
+%% Prevent lstinline from messing up
+\newcommand{\passthrough}[1]{#1}
+
 %% Normal enumerates processing
 \usepackage{enumerate}
 
