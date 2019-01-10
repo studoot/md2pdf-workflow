@@ -54,7 +54,7 @@ all: pdf html
 PRODUCTS = $(foreach var, $(filter DOCUMENT_%,$(.VARIABLES)), $($(var)))
 .PHONY: clean
 clean:
-	rm -f $(PRODUCTS)
+	$(RM) $(PRODUCTS)
 
 LUA_FILTERS        := plantuml.lua
 PANDOC_COMMON_OPTS := -f markdown+smart+auto_identifiers+ascii_identifiers+backtick_code_blocks+fenced_code_attributes $(foreach filter,$(LUA_FILTERS),--lua-filter=$(filter)) '--variable=scm-version:$(SCMVERSION)'
@@ -65,8 +65,12 @@ PANDOC_COMMON_OPTS := -f markdown+smart+auto_identifiers+ascii_identifiers+backt
 #
 DOCUMENT_TEX    := ${DOCUMENT:.md=.tex}
 DOCUMENT_PDF    := ${DOCUMENT:.md=.pdf}
-TEX_TEMPLATE    := pdf-template.tex
-PANDOC_TEX_OPTS := $(PANDOC_COMMON_OPTS) --standalone --number-sections --listings --template=$(TEX_TEMPLATE) --table-of-contents
+TEX_TEMPLATE    := default.latex
+PANDOC_TEX_OPTS := $(PANDOC_COMMON_OPTS) --standalone --number-sections --listings --table-of-contents --template=$(TEX_TEMPLATE)\
+    --variable=papersize:a4 --variable=fontsize:12pt --variable=documentclass:article --variable=classoption:final --variable=classoption:titlepage\
+    --variable=mainfont:Cambria --variable=sansfont:Calibri '--variable=monofont:Lucida Console' '--variable=monofontoptions:Scale=0.75'\
+    --variable=linkcolor:DarkSkyBlue --variable=citecolor:DarkSkyBlue --variable=filecolor:DarkSkyBlue --variable=toccolor:DarkSkyBlue --variable=urlcolor:DarkSkyBlue\
+    --variable=linestretch:1.2 --variable=geometry:margin=1in --variable=listsonownpage:1
 PANDOC_PDF_OPTS := $(PANDOC_TEX_OPTS) --pdf-engine xelatex
 %.tex : %.md; pandoc $< -o $@ $(PANDOC_TEX_OPTS)
 %.pdf : %.md; pandoc $< -o $@ $(PANDOC_PDF_OPTS)

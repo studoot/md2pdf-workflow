@@ -33,8 +33,27 @@ dolore incididunt adipisicing cupidatat esse enim culpa nostrud anim laboris ali
 
 Incididunt voluptate quis dolore dolore voluptate incididunt. Aliqua minim ad consectetur excepteur
 laboris est ad labore. Proident dolore amet esse eiusmod non adipisicing est. Voluptate amet ullamco
-nisi reprehenderit aute in duis. Lorem do quis consectetur aliquip ullamco eiusmod nulla id
+nisi reprehenderit aute in duis. `Lorem do quis consectetur` aliquip ullamco eiusmod nulla id
 incididunt.
+
+```make
+################################################################################
+#
+# LaTeX/PDF setup
+#
+DOCUMENT_TEX    := ${DOCUMENT:.md=.tex}
+DOCUMENT_PDF    := ${DOCUMENT:.md=.pdf}
+TEX_TEMPLATE    := default.latex
+PANDOC_TEX_OPTS := $(PANDOC_COMMON_OPTS) --standalone --number-sections --listings --table-of-contents --variable=papersize:a4 --variable=fontsize:12pt --variable=documentclass:article --variable=classoption:final --variable=classoption:titlepage --variable=mainfont:Cambria --variable=sansfont:Calibri '--variable=monofont:Lucida Console' '--variable=monofontoptions:Scale=0.75' --variable=linkcolor:DarkSkyBlue --variable=citecolor:DarkSkyBlue --variable=filecolor:DarkSkyBlue --variable=toccolor:DarkSkyBlue --variable=urlcolor:DarkSkyBlue --variable=linestretch:1.2 --template=$(TEX_TEMPLATE)
+PANDOC_PDF_OPTS := $(PANDOC_TEX_OPTS) --pdf-engine xelatex
+%.tex : %.md; pandoc $< -o $@ $(PANDOC_TEX_OPTS)
+%.pdf : %.md; pandoc $< -o $@ $(PANDOC_PDF_OPTS)
+.PHONY: tex
+tex: $(DOCUMENT_TEX)
+.PHONY: pdf
+pdf: $(DOCUMENT_PDF)
+$(DOCUMENT_PDF) $(DOCUMENT_TEX): $(TEX_TEMPLATE)
+```
 
 Ad proident culpa ipsum ipsum cillum sunt ut qui eiusmod dolore ex id Lorem. In sunt tempor aute
 commodo sunt in commodo quis enim dolore aliquip exercitation nisi. Cupidatat ut laboris sit do
