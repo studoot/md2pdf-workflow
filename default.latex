@@ -171,6 +171,19 @@ $if(verbatim-in-note)$
 $endif$
 $if(colorlinks)$
 \usepackage{xcolor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Add custom colours
+%% Tango color scheme
+\definecolor{SkyBlue}{HTML}{3465A4}
+\definecolor{DarkSkyBlue}{HTML}{204A87}
+\definecolor{Plum}{HTML}{75507B}
+\definecolor{ScarletRed}{HTML}{CC0000}
+\definecolor{Aluminium1}{HTML}{EEEEEC}
+\definecolor{Aluminium6}{HTML}{2e3436}
+\definecolor{Black}{HTML}{000000}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 \usepackage{hyperref}
 \hypersetup{
@@ -206,6 +219,52 @@ $endif$
 $if(listings)$
 \usepackage{listings}
 \newcommand{\passthrough}[1]{#1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Add custom inline listing
+\let\Oldlstinline\lstinline
+\renewcommand{\lstinline}[1]{\Oldlstinline[breaklines=true,breakatwhitespace=false,prebreak={}]#1}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Make inline listings use monofont
+\makeatletter
+\lst@AddToHook{TextStyle}{\let\lst@basicstyle\ttfamily\small\fontfamily{pcr}\selectfont}
+\makeatother
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Change standalone listing style
+\usepackage{MnSymbol}
+\newcommand{\listingsinglespacing}{%
+  \setstretch{1}% no correction afterwards
+}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\lstset{
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   showstringspaces=false,
+   showspaces=false,
+   numbers=none,
+   tabsize=2,
+   showtabs=false,
+   captionpos=b,
+   frame = TB,
+   breaklines = true,
+   breakatwhitespace = true,
+   basicstyle = \normalsize\ttfamily\listingsinglespacing,
+   prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}}
+}
+%
+% Redefine lstlisting environment to add orphan control.
+\usepackage{needspace}
+\let\Oldlstlisting\lstlisting
+\let\Oldendlstlisting\endlstlisting
+\renewenvironment{lstlisting}[1][]
+  {\needspace{5\baselineskip}\Oldlstlisting}
+  {\Oldendlstlisting\ignorespacesafterend}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 $if(lhs)$
 \lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
@@ -230,7 +289,12 @@ $if(graphics)$
 \usepackage{graphicx,grffile}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Reduce image max height to cater for our footer
+\def\maxheight{\ifdim\Gin@nat@height>0.975\textheight0.975\textheight\else\Gin@nat@height\fi}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \makeatother
 % Scale images if necessary, so that they will not overflow the page
 % margins by default, and it is still possible to overwrite the defaults
@@ -249,6 +313,20 @@ $endif$
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%% Set Sans font in headings
+\usepackage{sectsty}
+\allsectionsfont{\sffamily}
+%% Start sections from new page
+\let\Oldsection\section
+\renewcommand\section{\newpage\Oldsection}
+%% We want paragraphs to be more like subsections - on a line by themselves..
+% \usepackage{titlesec}
+% \titleformat{\paragraph}[hang]{\bfseries}{\theparagraph}{1em}{}
+% \titlespacing*{\paragraph}{0pt}{1.25ex plus 0.5ex minus 0.25 ex}{0.5ex}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $if(numbersections)$
 \setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
 $else$
@@ -273,10 +351,16 @@ $if(pagestyle)$
 \pagestyle{$pagestyle$}
 $endif$
 
-% set default figure placement to htbp
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% set default figure placement to hbt! (here, or else bottom of page or else top
+% of page)
 \makeatletter
-\def\fps@figure{htbp}
+\def\fps@figure{hbt!}
 \makeatother
+\addtolength\abovecaptionskip{-0.5cm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 $for(header-includes)$
 $header-includes$
@@ -344,6 +428,101 @@ $if(logo)$
 $endif$
 $endif$
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% add date commands
+\usepackage[en-GB]{datetime2}
+\DTMlangsetup[en-GB]{ord=raise}
+\def\parsedateHelper #1=#2-#3-#4\stopmark{\DTMsavedate{#1}{#2-#3-#4}}
+\def\parsedate#1{\parsedateHelper #1\stopmark}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Redefine maketitle. Need hyphenat for nohyphens
+\usepackage{hyphenat}
+\renewcommand{\maketitle}{
+  \thispagestyle{empty} % Remove page numbering on this page
+  \colorbox{Aluminium1}{
+    \begin{minipage}[t][\textwidth][t]{\textwidth}
+      \begin{minipage}[t][\dimexpr\textwidth-0.75cm\relax][t]{\dimexpr\textwidth-0.75cm\relax}
+        \begin{flushright}
+$if(title-block)$
+         $title-block$
+$else$
+          \centering{
+          \vspace*{1.5cm}
+          \fontsize{48pt}{40pt}\selectfont
+$if(title)$
+          \nohyphens{$title$}
+$else$
+          \nohyphens{TITLE HERE PLEASE}
+$endif$
+          }
+$endif$
+        \end{flushright}
+      \end{minipage}
+      \rightskip=0.05cm
+      \fontsize{8pt}{15pt}\selectfont
+      \vfill
+$if(version)$
+      \hfill Version: $version$
+$if(scm-version)$
+ ($scm-version$)
+$endif$
+$endif$
+    \end{minipage}
+  }
+
+  %----------------------------------------------------------------------------------------
+
+  \vfill % Space between the title box and author information
+
+  %----------------------------------------------------------------------------------------
+  % AUTHOR NAME AND INFORMATION SECTION
+  %----------------------------------------------------------------------------------------
+
+    \begin{flushright}
+    {\large
+    $if(author)$$author$ \\$endif$
+    $if(department)$$department$ \\$endif$
+    $if(organisation)$$organisation$ \\$endif$
+    $if(email)$\texttt{$email$} \\$endif$
+    }
+
+    \HRule{1pt} % Horizontal line, thickness changed here
+
+$if(issue-date)$
+    \parsedate{pubdate=$issue-date$}
+    \hfill \DTMusedate{pubdate}
+$endif$
+    \end{flushright}
+}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Add 'horizontal line' command
+\newcommand{\HRule}[1]{\hfill \rule{0.2\linewidth}{#1}} % Horizontal rule at the bottom of the page, adjust width here
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Add footer definition
+\usepackage{fancyhdr, lastpage}
+\usepackage{textpos}
+\fancyhf{}
+\fancyheadoffset{0cm}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{1pt}
+\lfoot{$version$\begin{textblock*}{3cm}[0,3.5](0pt,0pt){\fontsize{6pt}{0pt}\selectfont\textbf{\textsc{Version}}}\end{textblock*}}
+  $if(footer-title)$
+  \cfoot{\normalsize{$footer-title$}}
+  $else$
+  \cfoot{\normalsize{$title$}}
+  $endif$
+  \rfoot{\fontsize{10pt}{0pt}\selectfont\textsc{Page }\normalsize{\thepage}\fontsize{10pt}{0pt}\selectfont\textsc{\ of\ }\normalsize{\pageref*{LastPage}}}
+  % \setlength{\oddsidemargin}{0mm} % Adjust margins to center the colored title box
+  % \setlength{\evensidemargin}{0mm} % Margins on even pages - only necessary if adding more content to this template
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 $if(title)$
 $if(beamer)$
@@ -358,6 +537,15 @@ $abstract$
 $endif$
 $endif$
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Start page numbering & using the footer
+\clearpage % Whitespace to the end of the page
+\pagestyle{fancy}
+\setcounter{page}{1}
+\newgeometry{left=2cm, right=2cm, bottom=3cm, top=1.5cm}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $for(include-before)$
 $include-before$
 
@@ -380,14 +568,32 @@ $if(colorlinks)$
 $endif$
 \setcounter{tocdepth}{$toc-depth$}
 \tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Optionally leave TOC on its own page
+$if(listsonownpage)$\clearpage$endif$
+*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 }
 $endif$
 $endif$
 $if(lot)$
 \listoftables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Optionally leave LoT on its own page
+$if(listsonownpage)$\clearpage$endif$
+*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 $if(lof)$
 \listoffigures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Optionally leave LoF on its own page
+$if(listsonownpage)$\clearpage$endif$
+*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 $body$
 
