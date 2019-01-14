@@ -82,6 +82,16 @@ $(DOCUMENT_PDF) $(DOCUMENT_TEX): $(TEX_TEMPLATE)
 
 ################################################################################
 #
+# DOCX setup
+#
+DOCUMENT_DOCX    := ${DOCUMENT:.md=.docx}
+PANDOC_DOCX_OPTS := $(PANDOC_COMMON_OPTS) --standalone --to docx --self-contained
+%.docx : %.md; pandoc $< -o $@ $(PANDOC_DOCX_OPTS)
+.PHONY: docx
+docx: $(DOCUMENT_DOCX)
+
+################################################################################
+#
 # HTML setup
 #
 DOCUMENT_HTML    := ${DOCUMENT:.md=.html}
