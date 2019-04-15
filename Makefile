@@ -41,7 +41,7 @@ ifneq ($(GITRELFROMHG),$(GITROOT))
 # Get a commit description - this will be in the form <short-SHA1> or
 # <latest-tag>-<latest-tag-distance>/g<short-SHA1>. In all cases, a '+' will be
 # appended if the working copy is dirty.
-SCMVERSION := $(subst -0/,/,$(subst -g,/,$(shell git describe --long --always --tags --dirty=+ $(ERROR_REDIRECT))))
+SCMVERSION := $(shell git describe --long --always --tags --dirty=+ $(ERROR_REDIRECT))
 # Replace the '-g' before the short SHA-1 hash with '/' (has no effect for the first form of description)
 SCMVERSION := $(subst -g,/,$(SCMVERSION))
 # Remove '-0' after the tag name when this commit is the tagged commit (has no effect for the first form of description)
