@@ -628,7 +628,7 @@ $endif$
 %
 % Optionally leave TOC on its own page
 $if(listsonownpage)$\clearpage$endif$
-*
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 }
 $endif$
@@ -639,7 +639,7 @@ $if(lot)$
 %
 % Optionally leave LoT on its own page
 $if(listsonownpage)$\clearpage$endif$
-*
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 $if(lof)$
@@ -648,7 +648,7 @@ $if(lof)$
 %
 % Optionally leave LoF on its own page
 $if(listsonownpage)$\clearpage$endif$
-*
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $endif$
 $if(linestretch)$
