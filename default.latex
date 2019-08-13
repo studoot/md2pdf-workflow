@@ -599,7 +599,6 @@ $endif$
 \clearpage % Whitespace to the end of the page
 \pagestyle{fancy}
 \setcounter{page}{1}
-\newgeometry{left=2cm, right=2cm, bottom=3cm, top=1.5cm}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 $for(include-before)$
